@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Values.database.name }}
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  serviceName: "mysql"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      initContainers:
+      - name: init-mysql
+        image: busybox
+        command:
+        - sh
+        - -c
+        - rm -rf /var/lib/mysql/*
+        volumeMounts:
+        - name: mysql-persistent-storage
+          mountPath: /var/lib/mysql
+      containers:
+      - name: {{ .Values.database.name }}
+        image: mysql:5.7
+        ports:
+        - containerPort: {{ .Values.database.port }}
+          name: {{ .Values.database.name }}
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: {{ .Values.database.rootPassword }}
+        - name: MYSQL_DATABASE
+          value: devops_db
+        - name: MYSQL_USER
+          value: {{ .Values.database.user }}
+        - name: MYSQL_PASSWORD
+          value: {{ .Values.database.password }}
+        volumeMounts:
+        - name: mysql-persistent-storage
+          mountPath: /var/lib/mysql
+  volumeClaimTemplates:
+  - metadata:
+      name: mysql-persistent-storage
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: {{ .Values.database.storage }}

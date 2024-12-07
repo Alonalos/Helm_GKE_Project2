@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.api.name }}
+  labels:
+    app: devops-api
+spec:
+  replicas: {{ .Values.api.replicas }}
+  selector:
+    matchLabels:
+      app: devops-api
+  template:
+    metadata:
+      labels:
+        app: devops-api
+    spec:
+      containers:
+      - name: devops-api
+        image: {{ .Values.api.image }}:{{ .Values.api.tag }}
+        ports:
+        - containerPort: {{ .Values.api.port }}
+        env:
+        - name: PORT
+          value: "3001"
+        - name: DB
+          value: devops_db
+        - name: DBUSER
+          value: devops_user
+        - name: DBPASS
+          value: password
+        - name: DBHOST
+          value: mysql
+        - name: DBPORT
+          value: "3306"
