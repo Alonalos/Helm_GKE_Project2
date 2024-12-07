@@ -87,116 +87,105 @@ kubectl get pods
 terraform destroy -var "project_id=<your-project-id>" -auto-approve
 ```
 
-## 19) Create GKE Kubernetes container
-```
-gcloud beta container --project "<Project-id>" clusters create "ci-cd" --zone "us-central1-c" --no-enable-basic-auth --cluster-version "1.25.7-gke.1000" --release-channel "regular" --machine-type "e2-medium" --image-type "COS_CONTAINERD" --disk-type "pd-balanced" --disk-size "100" --metadata disable-legacy-endpoints=true --scopes "https://www.googleapis.com/auth/devstorage.read_only","https://www.googleapis.com/auth/logging.write","https://www.googleapis.com/auth/monitoring","https://www.googleapis.com/auth/servicecontrol","https://www.googleapis.com/auth/service.management.readonly","https://www.googleapis.com/auth/trace.append" --max-pods-per-node "110" --num-nodes "3" --logging=SYSTEM,WORKLOAD --monitoring=SYSTEM --enable-ip-alias --network "projects/qwiklabs-gcp-03-b499196e43ab/global/networks/default" --subnetwork "projects/qwiklabs-gcp-03-b499196e43ab/regions/us-central1/subnetworks/default" --no-enable-intra-node-visibility --default-max-pods-per-node "110" --no-enable-master-authorized-networks --addons HorizontalPodAutoscaling,HttpLoadBalancing,GcePersistentDiskCsiDriver --enable-autoupgrade --enable-autorepair --max-surge-upgrade 1 --max-unavailable-upgrade 0 --enable-shielded-nodes --node-locations "us-central1-c"
-```
-## 20) deploy dokcer image to kubernetes 
-```
-gcloud container clusters get-credentials ci-cd --zone us-central1-c --project <project-id>
-```
-## 20.1) Create deployment and service YAML files
-```
-nano deployment.yaml
-```
-```
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: ci-cd
-  labels:
-     app: myfirst-app
+GKE Cluster Setup
+1. Set the Active Project
+Specify the project containing your GKE cluster:
 
-spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: myfirst-app
+bash
+Copy code
+gcloud config set project <project-id>
+Example:
 
-  template:
-    metadata:
-      labels:
-        app: myfirst-app
+bash
+Copy code
+gcloud config set project gke-demo-443919
+2. Retrieve Cluster Credentials
+Fetch and store the GKE cluster’s authentication details in your local kubeconfig file (~/.kube/config):
 
-    spec:
-      containers:
-      - name: myfirst-app
-        image: pruthvidevops/deveops:app-v1
-        imagePullPolicy: Always
-        ports:
-        - containerPort: 8080
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
-```
-```
-nano service-expose.yaml
-```
-```
-apiVersion: v1
-kind: Service
-metadata:
-  name: ci-cd-service
-  labels:
-    app: myfirst-app
-spec:
-  selector:
-    app: myfirst-app
-    
-  ports:
-    - port: 8080
-      targetPort: 8080
+bash
+Copy code
+gcloud container clusters get-credentials <cluster-name> --region <region>
+Example:
 
-  type: LoadBalancer
-  ```
-## 20.2) deploy the deployment.yaml and service-expose.yaml
-```
-kubectl apply -f deployment.yaml
+bash
+Copy code
+gcloud container clusters get-credentials gke-demo-443919-gke --region us-east1
+3. Verify the Context
+Ensure that your kubectl context is set to your GKE cluster:
 
-watch kubectl get pods
+bash
+Copy code
+kubectl config current-context
+4. Test Connectivity
+Verify that you can interact with your cluster:
 
-kubectl apply -f service-expose.yaml
+bash
+Copy code
+kubectl get nodes
+Deploy Helm Chart to GKE Cluster
+1. Ensure Cluster Context
+Make sure your kubectl context points to your GKE cluster:
 
-watch kubectl get svc
-```
-## 21) Create a jenkins JOB
+bash
+Copy code
+gcloud container clusters get-credentials <cluster-name> --region <region>
+Example:
 
-1. Create and new job with by copying the previous **docker build and push JOB**
-2. add EXEC commands
-```
-echo -e "FROM tomcat:latest
-RUN cp -R  /usr/local/tomcat/webapps.dist/*  /usr/local/tomcat/webapps
-COPY ./*.war /usr/local/tomcat/webapps" > Dockerfile ;
+bash
+Copy code
+gcloud container clusters get-credentials gke-demo-443919-gke --region us-east1
+2. Install Helm (if not installed)
+Install Helm using the official installation guide: https://helm.sh/docs/intro/install/
 
-ansible-playbook /etc/ansible/docker.yaml
+3. Navigate to Your Chart Directory
+Move to the directory where your Helm chart is located:
 
-gcloud container clusters get-credentials ci-cd --zone us-central1-c --project qwiklabs-gcp-02-701d60ba3040
+bash
+Copy code
+cd <chart-directory>
+Example:
 
-kubectl delete deployment ci-cd
-kubectl apply -f deployment.yaml
-kubectl apply -f service-expose.yaml
-```
+bash
+Copy code
+cd ~/ci-cd-build-kubernetes/three-tier-app
+4. Deploy the Helm Chart
+Use the helm install command to deploy your application:
 
-## 21.1) Commit from the local repo
-```
-git init
-git pull
-git add .
-git commit -m "Deploying to kubernetes"
-git push
-```
-**Do Some changes in the index.jsp and perform the above steps**
+bash
+Copy code
+helm install <release-name> ./<chart-directory>
+Example:
 
-## 22) After completion of the jenkins JOB
+bash
+Copy code
+helm install three-tier-app ./three-tier-app
+5. Verify Deployment
+Check the status of all Kubernetes resources:
 
-```
-kubectl get svc
-```
-```
-http:<LoadBalaner-ip>:8080/webapp/
-```
-##-------------**NOW YOU SUCCESSFULLY ESTABLISHED THE CI-CD PIPELINE FOR THE ENTIRE DEPLOYMENT**--------------##
+bash
+Copy code
+kubectl get all
+6. Access Your Application
+For services with a LoadBalancer type, get the external IP:
 
-##-------------------------------------**THANKS FOR WATCHING**----------------------------------------------##
+bash
+Copy code
+kubectl get svc <service-name>
+Example:
+
+bash
+Copy code
+kubectl get svc web-deployment
+Access your application using the URL:
+
+php
+Copy code
+http://<EXTERNAL-IP>:<PORT>
+Understanding Key Components
+Binding
+Kubernetes Provider: Connects Terraform to your Kubernetes cluster.
+Helm Provider: Uses Kubernetes connections to deploy and manage Helm charts.
+Helm Release Resource
+Specifies the Chart: Points to the Helm chart and defines its configuration.
+Manages the Lifecycle: Handles operations such as installation, upgrades, and deletion.
+Follow these instructions to set up your GKE cluster, deploy your Helm chart, and manage your Kubernetes resources effectively.
