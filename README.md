@@ -96,43 +96,36 @@ Copy code
 gcloud config set project <project-id>
 Example:
 
-bash
-Copy code
+
 gcloud config set project gke-demo-443919
 2. Retrieve Cluster Credentials
 Fetch and store the GKE cluster’s authentication details in your local kubeconfig file (~/.kube/config):
 
-bash
-Copy code
+
 gcloud container clusters get-credentials <cluster-name> --region <region>
 Example:
 
-bash
-Copy code
+
 gcloud container clusters get-credentials gke-demo-443919-gke --region us-east1
 3. Verify the Context
 Ensure that your kubectl context is set to your GKE cluster:
 
-bash
-Copy code
+
 kubectl config current-context
 4. Test Connectivity
 Verify that you can interact with your cluster:
 
-bash
-Copy code
+
 kubectl get nodes
 Deploy Helm Chart to GKE Cluster
 1. Ensure Cluster Context
 Make sure your kubectl context points to your GKE cluster:
 
-bash
-Copy code
+
 gcloud container clusters get-credentials <cluster-name> --region <region>
 Example:
 
-bash
-Copy code
+
 gcloud container clusters get-credentials gke-demo-443919-gke --region us-east1
 2. Install Helm (if not installed)
 Install Helm using the official installation guide: https://helm.sh/docs/intro/install/
@@ -140,30 +133,25 @@ Install Helm using the official installation guide: https://helm.sh/docs/intro/i
 3. Navigate to Your Chart Directory
 Move to the directory where your Helm chart is located:
 
-bash
-Copy code
+
 cd <chart-directory>
 Example:
 
-bash
-Copy code
+
 cd ~/ci-cd-build-kubernetes/three-tier-app
 4. Deploy the Helm Chart
 Use the helm install command to deploy your application:
 
-bash
-Copy code
+
 helm install <release-name> ./<chart-directory>
 Example:
 
-bash
-Copy code
+
 helm install three-tier-app ./three-tier-app
 5. Verify Deployment
 Check the status of all Kubernetes resources:
 
-bash
-Copy code
+
 kubectl get all
 6. Access Your Application
 For services with a LoadBalancer type, get the external IP:
@@ -173,13 +161,11 @@ Copy code
 kubectl get svc <service-name>
 Example:
 
-bash
-Copy code
+
 kubectl get svc web-deployment
 Access your application using the URL:
 
-php
-Copy code
+
 http://<EXTERNAL-IP>:<PORT>
 Understanding Key Components
 Binding
