@@ -1,7 +1,11 @@
-README: Setting Up Google SDK, CLI, and Kubernetes Plugins
+ Setting Up Google SDK, CLI, and Kubernetes Plugins
 Setup Google SDK and CLI with Kubernetes Plugins
+
 gcloud CLI Configuration
-Install the Google Cloud CLI using the following command: sudo snap install google-cloud-cli --classic. Authenticate with gcloud auth login and set the project using gcloud config set project qwiklabs-gcp-02-ea4ca0d66fa5. Install the Google Cloud SDK with sudo snap install google-cloud-sdk --classic.
+
+Install the Google Cloud CLI using the following command:
+sudo snap install google-cloud-cli --classic. 
+Authenticate with gcloud auth login and set the project using gcloud config set project qwiklabs-gcp-02-ea4ca0d66fa5. Install the Google Cloud SDK with sudo snap install google-cloud-sdk --classic.
 
 gcloud SDK Installation
 Install necessary prerequisites: sudo apt-get install apt-transport-https ca-certificates gnupg -y. Add Google Cloud SDK to the package sources using: echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list. Import the keyring: curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -. Update packages and install the CLI: sudo apt-get update && sudo apt-get install google-cloud-cli. Finally, install additional plugins with sudo apt-get install google-cloud-cli-gke-gcloud-auth-plugin and initialize with gcloud init.
