@@ -35,6 +35,7 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+<<<<<<< HEAD
 terraform-gke/service-account.json
 terraform-gke/service-account.json
 echo "terraform-gke/service-account.json" > .gitignore
@@ -45,3 +46,5 @@ echo "*.tfvars.json" >> .gitignore
 git add .gitignore
 git commit -m "Add .gitignore to exclude sensitive files"
 
+=======
+>>>>>>> 2df359ecd153081d0d3dba9bd2fc438bc10a1a30
