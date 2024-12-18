@@ -8,7 +8,7 @@ provider "helm" {
 }
 resource "helm_release" "example" {
   name       = "default"
-  repository = "../three-tier-app"
-  chart      = "three-tier-app"
+  repository = "../three-tier-app" 
+  chart      = "."
   version    = "0.1.0"
 }
